@@ -1,1 +1,22 @@
-{}
+{
+    "infrastructure": {
+        "azure": {
+            "resourceGroup": {
+                "name": "",
+                "location": ""
+            },
+            "sqldb": {
+                "location": ""
+            }
+        },
+        "aws": {
+
+        }
+    },
+    "k2five": {
+
+    },
+    "demos": [{
+
+    }]
+}
