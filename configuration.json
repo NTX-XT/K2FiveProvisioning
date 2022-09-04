@@ -2,11 +2,32 @@
     "infrastructure": {
         "azure": {
             "resourceGroup": {
-                "name": "",
-                "location": ""
+                "name": "K2Demo1",
+                "location": "eastus"
             },
-            "sqldb": {
-                "location": ""
+            "sql": {
+                "admin": {
+                    "login": "SQLAdmin",
+                    "password" : "SQLAdmin123"
+                },
+                "server":{
+                    "name": "k2demo1sql",
+                    "location": "eastus"
+                },
+                "database": {
+                    "name": "K2"
+                }
+            },
+            "virtualNetwork": {
+                "name": "K2Provisioning1VNet"
+            },
+            "VirtualMachine": {
+                "admin": {
+                    "login": "K2Admin",
+                    "password": "K2Admin123"
+                },
+                "name": "K2Demo1VM",
+                "location": "eastus"
             }
         },
         "aws": {
