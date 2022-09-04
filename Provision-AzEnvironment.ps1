@@ -1,13 +1,19 @@
+param(
+    [Parameter()]
+    [string]$ConfigurationFile = ".\configuration.json"
+)
+
 #region 0. Loading and connecting Azure
 if(-not $(Get-Module Az)) {Import-Module Az -Force} 
 Connect-AzAccount -Subscription sub_immersion -TenantId 07948bdc-f1ec-40d6-a490-2380819cc701;  
+$configuration = get-content -raw -path $ConfigurationFile | ConvertFrom-Json
 #endregion
 
 #region 1. Create Resource Group
 
     $K2RG = @{
-        Name = "K2Demo1" ## TODO: Externalize the value
-        Location = "eastus" ## TODO: Externalize the value
+        Name = $configuration.infrastructure.azure.resourceGroup.name
+        Location = $configuration.infrastructure.azure.resourceGroup.location
     }
 
     ## What if the Azure Resource group already exists ?
@@ -28,17 +34,17 @@ Connect-AzAccount -Subscription sub_immersion -TenantId 07948bdc-f1ec-40d6-a490-
 #region 2. Provision Azure SQL DB
 
     $K2SQLAdmin = @{
-        Login = "SQLAdmin" ## TODO: Externalize the value
-        Pwd = Read-host "Enter the SQL Administrator password :" -AsSecureString ## TODO: Externalize the value
+        Login = $configuration.infrastructure.azure.sql.admin.login
+        Password = $configuration.infrastructure.azure.sql.admin.password 
     }
 
     ## Create the Azure SQL server (Version 12.0) with SQL authentication as required by K2 
     $K2SQLServer = @{
         ResourceGroupName = $K2RG.Name
-        Location = $K2RG.Location
-        ServerName = "k2demo1sql" ## TODO: Externalize the value
+        Location = $configuration.infrastructure.azure.sql.server.location
+        ServerName = $configuration.infrastructure.azure.sql.server.name
         ServerVersion = "12.0"
-        SqlAdministratorCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2SQLAdmin.Login, $(ConvertTo-SecureString -String $K2SQLAdmin.Pwd -AsPlainText -Force)        
+        SqlAdministratorCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2SQLAdmin.Login, $(ConvertTo-SecureString -String $K2SQLAdmin.Password -AsPlainText -Force)
     }
     $AzSQLServer = New-AzSqlServer @K2SQLServer
 
@@ -47,14 +53,14 @@ Connect-AzAccount -Subscription sub_immersion -TenantId 07948bdc-f1ec-40d6-a490-
         ResourceGroupName = $K2RG.Name
         ServerName = $AzSQLServer.ServerName
         FirewallRuleName = "AllowedIPs"
-        StartIpAddress = "0.0.0.0" ## TODO: Replace with externalized parameter
-        EndIpAddress = "0.0.0.0" ## TODO: Replace with externalized parameter
+        StartIpAddress = "0.0.0.0" 
+        EndIpAddress = "0.0.0.0" 
     }
     New-AzSqlServerFirewallRule @K2SQLFirewall
 
     ## Create the Azure SQL Database with an S2 performance level (minimum requirement for K2 integration)
     $K2SQLDB = @{
-        DatabaseName = "K2" ## TODO: Replace with externalized parameter
+        DatabaseName = $configuration.infrastructure.azure.sql.database.name
         ResourceGroupName = $K2RG.Name
         ServerName = $AzSQLServer.ServerName
         RequestedServiceObjectiveName = "S2" 
@@ -66,7 +72,7 @@ Connect-AzAccount -Subscription sub_immersion -TenantId 07948bdc-f1ec-40d6-a490-
 #region 3. Create Virtual Networking
 
     $K2VNet = @{
-        Name = 'K2Provisioning1VNet' ## TODO: Externalize the value
+        Name = $configuration.infrastructure.azure.virtualNetwork.name
         ResourceGroupName = $K2RG.Name
         Location = $K2RG.Location
         AddressPrefix = '10.0.0.0/16'    
@@ -86,25 +92,26 @@ Connect-AzAccount -Subscription sub_immersion -TenantId 07948bdc-f1ec-40d6-a490-
 #region 4. Create the VM
 
     $K2VMAdmin = @{
-        Login = "K2Admin" ## TODO: Externalize the value
-        Pwd = Read-host "Enter the SQL Administrator password :" -AsSecureString ## TODO: Externalize the value
+        Login = $configuration.infrastructure.azure.VirtualMachine.admin.login
+        Password = $configuration.infrastructure.azure.VirtualMachine.admin.password
     }
 
     $K2VM = @{
         ResourceGroupName = $K2RG.Name
         Location = $K2RG.Location
-        Name = 'K2Demo1VM' ## TODO: Externalize the value
+        Name = $configuration.infrastructure.azure.VirtualMachine.name
         VirtualNetworkName = $K2VNet.Name
         SubnetName = $K2SubNet.Name
         OpenPorts = 80,3389
         ImageName = "MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest" 
         Size = "Standard_DS3"
-        Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $(ConvertTo-SecureString -String $K2VMAdmin.Pwd -AsPlainText -Force)        
-
+        Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $(ConvertTo-SecureString -String $K2VMAdmin.Password -AsPlainText -Force)      
     }
     New-AzVM @K2VM
 
 #endregion
+
+Exit
 
 #region 9. Clean-up
     Remove-AzResourceGroup -ResourceGroupName $K2RG.Name -Confirm:$false -Force;
