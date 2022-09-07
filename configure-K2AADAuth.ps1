@@ -1,0 +1,1 @@
+# TODO: Automagically configure K2 AAD auth. This will include creating and registring an App on the Azure AD

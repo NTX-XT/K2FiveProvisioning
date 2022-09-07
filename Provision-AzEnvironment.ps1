@@ -116,6 +116,8 @@ New-AzVM @K2VM
 
 #endregion
 
+# TODO: (optional) Create a file storage for the lifecycle of the provisioning and store configuration there
+
 Exit
 
 #region 9. Clean-up
