@@ -5,9 +5,8 @@ param(
 
 #region 0. Loading and connecting Azure
 if (-not $(Get-Module Az)) { Import-Module Az -Force } 
-# TODO: add subscription name and tenant id in the configuration
-Connect-AzAccount -Subscription sub_immersion -TenantId 07948bdc-f1ec-40d6-a490-2380819cc701;  
 $configuration = get-content -raw -path $ConfigurationFile | ConvertFrom-Json
+Connect-AzAccount -Subscription $configuration.infrastructure.azure.tenant.Subscription -TenantId $configuration.infrastructure.azure.tenant.id;  
 #endregion
 
 #region 1. Create Resource Group
@@ -36,7 +35,7 @@ if (-not $?) {
 
 $K2SQLAdmin = @{
     Login    = $configuration.infrastructure.azure.sql.admin.login
-    Password = $configuration.infrastructure.azure.sql.admin.password 
+    Password = ConvertTo-SecureString -String $configuration.infrastructure.azure.sql.admin.password -AsPlainText -Force
 }
 
 ## Create the Azure SQL server (Version 12.0) with SQL authentication as required by K2 
@@ -45,21 +44,22 @@ $K2SQLServer = @{
     Location                    = $configuration.infrastructure.azure.sql.server.location
     ServerName                  = $configuration.infrastructure.azure.sql.server.name
     ServerVersion               = "12.0"
-    SqlAdministratorCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2SQLAdmin.Login, $(ConvertTo-SecureString -String $K2SQLAdmin.Password -AsPlainText -Force)
+    SqlAdministratorCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2SQLAdmin.Login, $K2SQLAdmin.Password
 }
 $AzSQLServer = New-AzSqlServer @K2SQLServer
 
-## Create the Azure SQL Server Firewall Rule
+## Create the Azure SQL Server Firewall Rule for external use if requested
 
-# TODO: Add a configuration option to enable external access to SQL Server.
-$K2SQLFirewall = @{
-    ResourceGroupName = $K2RG.Name
-    ServerName        = $AzSQLServer.ServerName
-    FirewallRuleName  = "AllowedIPs"
-    StartIpAddress    = "0.0.0.0" 
-    EndIpAddress      = "0.0.0.0" 
+if ($configuration.infrastructure.azure.sql.server.withExternal){
+    $K2SQLFirewall = @{
+        ResourceGroupName = $K2RG.Name
+        ServerName        = $AzSQLServer.ServerName
+        FirewallRuleName  = "AllowAllWindowsAzureIps"
+        StartIpAddress    = "0.0.0.0" 
+        EndIpAddress      = "0.0.0.0" 
+    }
+    New-AzSqlServerFirewallRule @K2SQLFirewall
 }
-New-AzSqlServerFirewallRule @K2SQLFirewall
 
 ## Create the Azure SQL Database with an S2 performance level (minimum requirement for K2 integration)
 $K2SQLDB = @{
@@ -96,10 +96,10 @@ $AzVNet | Set-AzVirtualNetwork
 
 $K2VMAdmin = @{
     Login    = $configuration.infrastructure.azure.VirtualMachine.admin.login
-    Password = $configuration.infrastructure.azure.VirtualMachine.admin.password
+    Password = ConvertTo-SecureString -String $configuration.infrastructure.azure.VirtualMachine.admin.password -AsPlainText -Force
 }
 
-# TODO: Add size and ImageName to the configuration, with best practices as defaults
+## Create the VM Configuration
 
 $K2VM = @{
     ResourceGroupName  = $K2RG.Name
@@ -108,15 +108,48 @@ $K2VM = @{
     VirtualNetworkName = $K2VNet.Name
     SubnetName         = $K2SubNet.Name
     OpenPorts          = 80, 3389
-    ImageName          = "MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest" 
-    Size               = "Standard_DS3"
-    Credential         = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $(ConvertTo-SecureString -String $K2VMAdmin.Password -AsPlainText -Force)      
+    ImageName          = $configuration.infrastructure.azure.VirtualMachine.imageName 
+    Size               = $configuration.infrastructure.azure.VirtualMachine.size
+    Credential         = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $K2VMAdmin.Password     
 }
 New-AzVM @K2VM
 
 #endregion
 
+#region 5. Create File storage
+
+## Create Storage Account
+$K2StorageAccount = @{
+    ResourceGroupName = $K2RG.Name
+    Name = $configuration.infrastructure.azure.storageAccount.name
+    Location = $configuration.infrastructure.azure.storageAccount.location
+    Kind = $configuration.infrastructure.azure.storageAccount.kind
+    SkuName = $configuration.infrastructure.azure.storageAccount.skuName
+    EnableLargeFileShare = $configuration.infrastructure.azure.storageAccount.enableLargeFileShare
+}
+$K2StorageAccount = New-AzStorageAccount @K2StorageAccount
+
+## Create File Share
+$K2FileStorage = @{
+    StorageAccount = $K2StorageAccount
+    Name = $configuration.infrastructure.azure.fileStorage.name
+    EnabledProtocol = "SMB"
+    QuotaGiB = 1024
+}
+New-AzRmStorageShare $K2FileStorage
+
+$K2StorageDirectory = @{
+    Context = $K2StorageAccount.Context
+    ShareName = $K2FileStorage.Name
+    Path = "K2Config"
+}
+New-AzStorageDirectory $K2StorageDirectory
+
 # TODO: (optional) Create a file storage for the lifecycle of the provisioning and store configuration there
+# TODO: Continue on uploading content file
+
+#endregion
+
 
 Exit
 
