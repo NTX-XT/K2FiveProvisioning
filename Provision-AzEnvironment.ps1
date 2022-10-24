@@ -112,11 +112,11 @@ $K2VM = @{
     Size               = $configuration.infrastructure.azure.VirtualMachine.size
     Credential         = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $K2VMAdmin.Password     
 }
-New-AzVM @K2VM
+New-AzVM @K2VM | Out-Null
 
 #endregion
 
-#region 5. Create File storage
+#region 5. (optional) Create a file storage for the lifecycle of the provisioning and store configuration
 
 ## Create Storage Account
 $K2StorageAccount = @{
@@ -127,32 +127,66 @@ $K2StorageAccount = @{
     SkuName = $configuration.infrastructure.azure.storageAccount.skuName
     EnableLargeFileShare = $configuration.infrastructure.azure.storageAccount.enableLargeFileShare
 }
-$K2StorageAccount = New-AzStorageAccount @K2StorageAccount
+$StorageAccount = New-AzStorageAccount @K2StorageAccount
+$StorageAccountKey = $(Get-AzStorageAccountKey -ResourceGroupName K2Demo1 -AccountName K2Demo1StorageAcct | Where-Object{$_.KeyName -eq "key1"}).Value
+
+## Create Storage Container
+$K2StorageContainer = @{
+    Name = "k2setup"
+    Context = $StorageAccount.Context
+    Permission = "Blob"
+}
+New-AzStorageContainer @K2StorageContainer
 
 ## Create File Share
 $K2FileStorage = @{
-    StorageAccount = $K2StorageAccount
+    StorageAccount = $StorageAccount
     Name = $configuration.infrastructure.azure.fileStorage.name
     EnabledProtocol = "SMB"
     QuotaGiB = 1024
 }
-New-AzRmStorageShare $K2FileStorage
+New-AzRmStorageShare @K2FileStorage
 
 $K2StorageDirectory = @{
-    Context = $K2StorageAccount.Context
+    Context = $StorageAccount.Context
     ShareName = $K2FileStorage.Name
     Path = "K2Config"
 }
-New-AzStorageDirectory $K2StorageDirectory
+New-AzStorageDirectory @K2StorageDirectory
 
-# TODO: (optional) Create a file storage for the lifecycle of the provisioning and store configuration there
-# TODO: Continue on uploading content file
+##  Mount file share 
+$runCommandparameters =@{
+    AccountStorageKey = $StorageAccountKey
+    AccountStorageName = $K2StorageAccount.Name
+    FileShareName = $K2FileStorage.Name
+}
+Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $K2VM.Name -CommandId 'RunPowerShellScript' -ScriptPath '.\mount-K2FileShareFromVM.ps1' `
+-Parameter $runCommandparameters
 
 #endregion
 
+#region 6. Continue on uploading content file
+
+#TODO: Focus on 1st approach: deploying on local files
+#TODO: 2nd approach: deploying on azure storage later
+
+#endregion
 
 Exit
 
 #region 9. Clean-up
 Remove-AzResourceGroup -ResourceGroupName $K2RG.Name -Confirm:$false -Force;
+#endregion
+
+#region 0. Create Address IP Public
+$ip = @{
+    Name = "K2IPPublic"
+    ResourceGroupName = $K2RG.Name
+    Location = 'eastus'
+    Sku = 'Standard'
+    AllocationMethod = 'Static'
+    IpAddressVersion = 'IPv4'
+    Zone = 2
+}
+New-AzPublicIpAddress @ip
 #endregion
