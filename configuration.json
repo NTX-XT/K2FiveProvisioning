@@ -45,15 +45,14 @@
             },
             "fileStorage":{
                 "name": "k2demo1"
-
             }
         },
         "aws": {
 
         }
     },
-    "k2five": {
-
+    "setup": {
+        "repository": "C:\\K2"
     },
     "demos": [{
 
