@@ -2,7 +2,7 @@
     "k2Five": {
         "installer": "https://cdn-cms.k2.com/cms/product_downloads/K2%20Five%20(5.6)%20(5.0007.1000.0).exe",
         "clientToolsInstaller" : "https://cdn-cms.k2.com/cms/product_downloads/K2%20Five%20(5.6)%20(5.0007.1000.0)%20Client%20Tools.exe",
-        "identityServiceInstaller":"https://cdn-cms.k2.com/cms/product_downloads/Enable%20New%20Identity%20Service.exe",
+        "identityServiceInstaller": "https://cdn-cms.k2.com/cms/product_downloads/Enable%20New%20Identity%20Service.exe",
         "patches": [
             {
                 "installer":"https://"

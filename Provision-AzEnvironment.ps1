@@ -1,16 +1,17 @@
 param(
     [Parameter()]
-    [string]$ConfigurationFile = ".\configuration.json"
+    [string]$ConfigurationFile = ".\configuration.json",
+    [string]$PackagingFile = ".\packaging.json"
 )
 
 #region 0. Loading and connecting Azure
 if (-not $(Get-Module Az)) { Import-Module Az -Force } 
 $configuration = get-content -raw -path $ConfigurationFile | ConvertFrom-Json
+$packaging = get-content -raw -path $PackagingFile | ConvertFrom-Json
 Connect-AzAccount -Subscription $configuration.infrastructure.azure.tenant.Subscription -TenantId $configuration.infrastructure.azure.tenant.id;  
 #endregion
 
 #region 1. Create Resource Group
-
 $K2RG = @{
     Name     = $configuration.infrastructure.azure.resourceGroup.name
     Location = $configuration.infrastructure.azure.resourceGroup.location
@@ -22,7 +23,7 @@ if ($(Get-AzResourceGroup -Name $K2RG.Name  -ErrorAction SilentlyContinue)) {
     Exit 1       
 }
 
-New-AzResourceGroup @K2RG -ErrorAction SilentlyContinue;
+New-AzResourceGroup @K2RG -ErrorAction SilentlyContinue
 
 if (-not $?) {
     ## If an error occured, exit with code 1.
@@ -80,15 +81,26 @@ $K2VNet = @{
     Location          = $K2RG.Location
     AddressPrefix     = '10.0.0.0/16'    
 }
-$AzVNet = New-AzVirtualNetwork @K2VNet
+$AzVNet = New-AzVirtualNetwork @K2VNet 
 
 $K2SubNet = @{
     Name           = 'default'
     VirtualNetwork = $AzVNet
     AddressPrefix  = '10.0.0.0/24'
 }
-Add-AzVirtualNetworkSubnetConfig @K2SubNet
+Add-AzVirtualNetworkSubnetConfig @K2SubNet 
 $AzVNet | Set-AzVirtualNetwork
+
+$K2IPPublic = @{
+    Name = "K2IPPublic"
+    ResourceGroupName = $K2RG.Name
+    Location = 'eastus'
+    Sku = 'Standard'
+    AllocationMethod = 'Static'
+    IpAddressVersion = 'IPv4'
+    Zone = 2
+}
+$AzIPPublic = New-AzPublicIpAddress @K2IPPublic
 
 #endregion
 
@@ -99,21 +111,42 @@ $K2VMAdmin = @{
     Password = ConvertTo-SecureString -String $configuration.infrastructure.azure.VirtualMachine.admin.password -AsPlainText -Force
 }
 
-## Create the VM Configuration
-
 $K2VM = @{
     ResourceGroupName  = $K2RG.Name
     Location           = $K2RG.Location
     Name               = $configuration.infrastructure.azure.VirtualMachine.name
     VirtualNetworkName = $K2VNet.Name
     SubnetName         = $K2SubNet.Name
+    PublicIpAddressName = $AzIPPublic.Name
     OpenPorts          = 80, 3389
     ImageName          = $configuration.infrastructure.azure.VirtualMachine.imageName 
     Size               = $configuration.infrastructure.azure.VirtualMachine.size
     Credential         = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $K2VMAdmin.Password     
 }
-New-AzVM @K2VM | Out-Null
+New-AzVM @K2VM 
+#endregion
 
+#region 5. Prepare K2 Deployment
+
+## Enable PS Remoting
+Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $configuration.infrastructure.azure.VirtualMachine.name -CommandId 'EnableRemotePS'
+
+## Prepare K2 Deployment
+$runCommandparameters = @{
+    Installer = $packaging.k2Five.installer
+    ClientToolInstaller = $packaging.k2Five.clientToolsInstaller
+    IdentityServiceInstaller = $packaging.k2Five.identityServiceInstaller
+    Patches = $packaging.k2Five.patches
+}
+Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $configuration.infrastructure.azure.VirtualMachine.name -CommandId 'RunPowerShellScript' `
+-ScriptPath '.\deploy_localfiles\prepare-K2Deployment.ps1' -Parameter $runCommandparameters
+
+#endregion
+
+Exit
+
+#region 9. Clean-up
+Remove-AzResourceGroup -ResourceGroupName $K2RG.Name -Confirm:$false -Force;
 #endregion
 
 #region 5. (optional) Create a file storage for the lifecycle of the provisioning and store configuration
@@ -163,30 +196,4 @@ $runCommandparameters =@{
 Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $K2VM.Name -CommandId 'RunPowerShellScript' -ScriptPath '.\mount-K2FileShareFromVM.ps1' `
 -Parameter $runCommandparameters
 
-#endregion
-
-#region 6. Continue on uploading content file
-
-#TODO: Focus on 1st approach: deploying on local files
-#TODO: 2nd approach: deploying on azure storage later
-
-#endregion
-
-Exit
-
-#region 9. Clean-up
-Remove-AzResourceGroup -ResourceGroupName $K2RG.Name -Confirm:$false -Force;
-#endregion
-
-#region 0. Create Address IP Public
-$ip = @{
-    Name = "K2IPPublic"
-    ResourceGroupName = $K2RG.Name
-    Location = 'eastus'
-    Sku = 'Standard'
-    AllocationMethod = 'Static'
-    IpAddressVersion = 'IPv4'
-    Zone = 2
-}
-New-AzPublicIpAddress @ip
 #endregion
