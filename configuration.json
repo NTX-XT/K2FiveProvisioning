@@ -24,7 +24,11 @@
                 }
             },
             "virtualNetwork": {
-                "name": "K2Provisioning1VNet"
+                "name": "K2Demo1VNet"
+            },
+            "publicIP":{
+                "name": "K2IPPublic",
+                "domainNameLabel": "k2demo1vm"
             },
             "VirtualMachine": {
                 "admin": {

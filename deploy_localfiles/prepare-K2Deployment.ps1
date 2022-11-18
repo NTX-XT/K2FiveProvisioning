@@ -1,21 +1,11 @@
-
-param(
-    [Parameter()]
-    [string]$Installer,
-    [string]$ClientToolInstaller,
-    [string]$IdentityServiceInstaller,
-    [array]$Patches
-
-)
-
-#region 1.0 Prepare K2 Repository
-MKdir -Path "C:\" -Name "K2" 
-#endregion
+$packaging = get-content -raw -path C:\K2\packaging.json | ConvertFrom-Json
 
 Start-Transcript -Path "C:\K2\K2Provisioning.log"
 
+Write-host $packaging.k2Five.installer
+
 #region 2.0 Download
-$Installer, $ClientToolInstaller, $IdentityServiceInstaller | ForEach-Object{
+$packaging.k2Five.installer, $packaging.k2Five.clientToolsInstaller, $packaging.k2Five.identityServiceInstaller | ForEach-Object{
     $filePath = "C:\K2\" + (Split-Path [System.Web.HttpUtility]::UrlDecode($_) -Leaf)
     Invoke-WebRequest -Uri $_ -OutFile $filePath -UseBasicParsing
 }

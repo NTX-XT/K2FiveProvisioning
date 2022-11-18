@@ -1,13 +1,11 @@
 param(
     [Parameter()]
-    [string]$ConfigurationFile = ".\configuration.json",
-    [string]$PackagingFile = ".\packaging.json"
+    [string]$ConfigurationFile = ".\configuration.json"
 )
 
 #region 0. Loading and connecting Azure
 if (-not $(Get-Module Az)) { Import-Module Az -Force } 
 $configuration = get-content -raw -path $ConfigurationFile | ConvertFrom-Json
-$packaging = get-content -raw -path $PackagingFile | ConvertFrom-Json
 Connect-AzAccount -Subscription $configuration.infrastructure.azure.tenant.Subscription -TenantId $configuration.infrastructure.azure.tenant.id;  
 #endregion
 
@@ -92,12 +90,13 @@ Add-AzVirtualNetworkSubnetConfig @K2SubNet
 $AzVNet | Set-AzVirtualNetwork
 
 $K2IPPublic = @{
-    Name = "K2IPPublic"
+    Name = $configuration.infrastructure.azure.publicIP.name
     ResourceGroupName = $K2RG.Name
     Location = 'eastus'
     Sku = 'Standard'
     AllocationMethod = 'Static'
     IpAddressVersion = 'IPv4'
+    DomainNameLabel =$configuration.infrastructure.azure.publicIP.DomainNameLabel.ToLower()
     Zone = 2
 }
 $AzIPPublic = New-AzPublicIpAddress @K2IPPublic
@@ -112,41 +111,24 @@ $K2VMAdmin = @{
 }
 
 $K2VM = @{
-    ResourceGroupName  = $K2RG.Name
-    Location           = $K2RG.Location
-    Name               = $configuration.infrastructure.azure.VirtualMachine.name
-    VirtualNetworkName = $K2VNet.Name
-    SubnetName         = $K2SubNet.Name
+    ResourceGroupName   = $K2RG.Name
+    Location            = $K2RG.Location
+    Name                = $configuration.infrastructure.azure.VirtualMachine.name.ToLower()
+    VirtualNetworkName  = $K2VNet.Name
+    SubnetName          = $K2SubNet.Name
     PublicIpAddressName = $AzIPPublic.Name
-    OpenPorts          = 80, 3389
-    ImageName          = $configuration.infrastructure.azure.VirtualMachine.imageName 
-    Size               = $configuration.infrastructure.azure.VirtualMachine.size
-    Credential         = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $K2VMAdmin.Password     
+    OpenPorts           = 80, 3389, 5986
+    ImageName           = $configuration.infrastructure.azure.VirtualMachine.imageName 
+    Size                = $configuration.infrastructure.azure.VirtualMachine.size
+    Credential          = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $K2VMAdmin.Password     
 }
 New-AzVM @K2VM 
-#endregion
-
-#region 5. Prepare K2 Deployment
-
-## Enable PS Remoting
-Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $configuration.infrastructure.azure.VirtualMachine.name -CommandId 'EnableRemotePS'
-
-## Prepare K2 Deployment
-$runCommandparameters = @{
-    Installer = $packaging.k2Five.installer
-    ClientToolInstaller = $packaging.k2Five.clientToolsInstaller
-    IdentityServiceInstaller = $packaging.k2Five.identityServiceInstaller
-    Patches = $packaging.k2Five.patches
-}
-Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $configuration.infrastructure.azure.VirtualMachine.name -CommandId 'RunPowerShellScript' `
--ScriptPath '.\deploy_localfiles\prepare-K2Deployment.ps1' -Parameter $runCommandparameters
-
 #endregion
 
 Exit
 
 #region 9. Clean-up
-Remove-AzResourceGroup -ResourceGroupName $K2RG.Name -Confirm:$false -Force;
+Remove-AzResourceGroup -ResourceGroupName $configuration.infrastructure.azure.resourceGroup.name -Confirm:$false -Force;
 #endregion
 
 #region 5. (optional) Create a file storage for the lifecycle of the provisioning and store configuration
