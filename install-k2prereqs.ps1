@@ -21,6 +21,5 @@ Copy-Item .\deploy_localfiles\prepare-K2Deployment.ps1 -Destination C:\K2\prepar
 #endregion
 
 #region 3. Start Script 
-Invoke-AzVMRunCommand -ResourceGroupName $configuration.infrastructure.azure.resourceGroup.name -VMName $configuration.infrastructure.azure.VirtualMachine.name -CommandId 'RunPowerShellScript' `
--ScriptPath '.\deploy_localfiles\prepare-K2Deployment'
+Invoke-Command -ComputerName $computerName -ScriptBlock { C:\K2\prepare-K2Deployment.ps1 } -Credential $credential -SessionOption $so -UseSSL
 #endregion
