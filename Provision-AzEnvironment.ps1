@@ -39,7 +39,7 @@ $K2SQLAdmin = @{
 
 ## Create the Azure SQL server (Version 12.0) with SQL authentication as required by K2 
 $K2SQLServer = @{
-    ResourceGroupName           = $K2RG.Name
+    ResourceGroupName           = $configuration.infrastructure.azure.resourceGroup.name
     Location                    = $configuration.infrastructure.azure.sql.server.location
     ServerName                  = $configuration.infrastructure.azure.sql.server.name
     ServerVersion               = "12.0"
@@ -51,7 +51,7 @@ $AzSQLServer = New-AzSqlServer @K2SQLServer
 
 if ($configuration.infrastructure.azure.sql.server.withExternal){
     $K2SQLFirewall = @{
-        ResourceGroupName = $K2RG.Name
+        ResourceGroupName = $configuration.infrastructure.azure.resourceGroup.name
         ServerName        = $AzSQLServer.ServerName
         FirewallRuleName  = "AllowAllWindowsAzureIps"
         StartIpAddress    = "0.0.0.0" 
@@ -63,7 +63,7 @@ if ($configuration.infrastructure.azure.sql.server.withExternal){
 ## Create the Azure SQL Database with an S2 performance level (minimum requirement for K2 integration)
 $K2SQLDB = @{
     DatabaseName                  = $configuration.infrastructure.azure.sql.database.name
-    ResourceGroupName             = $K2RG.Name
+    ResourceGroupName             = $configuration.infrastructure.azure.resourceGroup.name
     ServerName                    = $AzSQLServer.ServerName
     RequestedServiceObjectiveName = "S2" 
 }
@@ -117,7 +117,7 @@ $K2VM = @{
     VirtualNetworkName  = $K2VNet.Name
     SubnetName          = $K2SubNet.Name
     PublicIpAddressName = $AzIPPublic.Name
-    OpenPorts           = 80, 3389, 5986
+    OpenPorts           = 80, 443, 3389, 5552, 5555, 5560, 5986
     ImageName           = $configuration.infrastructure.azure.VirtualMachine.imageName 
     Size                = $configuration.infrastructure.azure.VirtualMachine.size
     Credential          = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2VMAdmin.Login, $K2VMAdmin.Password     
@@ -135,7 +135,7 @@ Remove-AzResourceGroup -ResourceGroupName $configuration.infrastructure.azure.re
 
 ## Create Storage Account
 $K2StorageAccount = @{
-    ResourceGroupName = $K2RG.Name
+    ResourceGroupName = $configuration.infrastructure.azure.resourceGroup.name
     Name = $configuration.infrastructure.azure.storageAccount.name
     Location = $configuration.infrastructure.azure.storageAccount.location
     Kind = $configuration.infrastructure.azure.storageAccount.kind
@@ -143,7 +143,6 @@ $K2StorageAccount = @{
     EnableLargeFileShare = $configuration.infrastructure.azure.storageAccount.enableLargeFileShare
 }
 $StorageAccount = New-AzStorageAccount @K2StorageAccount
-$StorageAccountKey = $(Get-AzStorageAccountKey -ResourceGroupName K2Demo1 -AccountName K2Demo1StorageAcct | Where-Object{$_.KeyName -eq "key1"}).Value
 
 ## Create Storage Container
 $K2StorageContainer = @{

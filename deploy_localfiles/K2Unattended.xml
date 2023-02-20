@@ -1,0 +1,175 @@
+<PRODUCT Version="5.0007.1000.1">
+  <COMPONENTS>
+    <CORE />
+    <DATABASE />
+    <CFG />
+    <SERVER />
+    <PDF />
+    <WORKSPACE />
+    <NSA />
+    <CLIENT_PD />
+  </COMPONENTS>
+  <VARIABLES>
+    <add key="[PREVIOUS_INSTALLED_VERSION]" />
+    <add key="[UPDATE_HISTORY]">k2demo1vm&gt;|</add>
+    <add key="[WORKSPACEDISTRIBUTED]">true</add>
+    <add key="[APP_ID]">3308eaff-d056-4a32-9b1d-563f81bf06f9</add>
+    <add key="[MACHINEKEY]">3D72ED8814C168D9</add>
+    <add key="[INSTALLDIR]">C:\Program Files\K2\</add>
+    <add key="[CONFIGURATIONFOLDER]">C:\Program Files\K2\Configuration</add>
+    <add key="[SIMPLEINSTALL]">false</add>
+    <add key="[INST_Label]">K2SQL</add>
+    <add key="[USRMGRTYPE]">UMTYPE_SQLUM</add>
+    <add key="[SMARTACTIONSENABLED]">false</add>
+    <add key="[HOSTSERVERDBNAME]">K2</add>
+    <add key="[HOSTSERVERDBSQLSERVER]">k2demo1sql.database.windows.net</add>
+    <add key="[HOSTSERVERCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[SMARTBROKERDBNAME]">K2</add>
+    <add key="[SMARTBROKERDBSQLSERVER]">k2demo1vm</add>
+    <add key="[SMARTBROKERCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[CATEGORIESDBNAME]">K2</add>
+    <add key="[CATEGORIESDBSQLSERVER]">k2demo1vm</add>
+    <add key="[CATEGORIESCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[DEPENDANCIESDBNAME]">K2</add>
+    <add key="[DEPENDANCIESDBSQLSERVER]">k2demo1vm</add>
+    <add key="[DEPENDANCIESCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[ENVIRONMENTLIBRARYDBNAME]">K2</add>
+    <add key="[ENVIRONMENTLIBRARYDBSQLSERVER]">k2demo1vm</add>
+    <add key="[ENVIRONMENTLIBRARYCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[EVENTBUSDBNAME]">K2</add>
+    <add key="[EVENTBUSDBSQLSERVER]">k2demo1vm</add>
+    <add key="[EVENTBUSCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[EVENTBUSSCHEDULERDBNAME]">K2</add>
+    <add key="[EVENTBUSSCHEDULERDBSQLSERVER]">k2demo1vm</add>
+    <add key="[EVENTBUSSCHEDULERCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[K2DBNAME]">K2</add>
+    <add key="[K2DBSQLSERVER]">k2demo1vm</add>
+    <add key="[K2CONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[K2SQLUMDBNAME]">K2</add>
+    <add key="[K2SQLUMDBSQLSERVER]">k2demo1vm</add>
+    <add key="[K2SQLUMCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[SMARTBOXDBNAME]">K2</add>
+    <add key="[SMARTBOXDBSQLSERVER]">k2demo1vm</add>
+    <add key="[SMARTBOXCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[WEBDESIGNERDBNAME]">K2</add>
+    <add key="[WEBDESIGNERDBSQLSERVER]">k2demo1vm</add>
+    <add key="[WEBDESIGNERCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[WORKSPACEDBNAME]">K2</add>
+    <add key="[WORKSPACEDBSQLSERVER]">k2demo1vm</add>
+    <add key="[WORKSPACECONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[K2LOGDBNAME]">K2</add>
+    <add key="[K2LOGDBSQLSERVER]">k2demo1vm</add>
+    <add key="[K2LOGCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[WEBWORKFLOWDBNAME]">K2</add>
+    <add key="[WEBWORKFLOWDBSQLSERVER]">k2demo1vm</add>
+    <add key="[WEBWORKFLOWCONNECTIONSTRING]">Data Source=k2demo1sql.database.windows.net;Initial Catalog=K2;uid=SQLAdmin;pwd=AVeryStrongP@ssword0;Pooling=True</add>
+    <add key="[K2HOSTCONNECTIONSTRING]">Integrated=False;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5555;UserID=K2Admin;Password=AveryStrongP@ssword0</add>
+    <add key="[K2WFCONNECTIONSTRING]">Integrated=False;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5252;UserID=K2Admin;Password=AveryStrongP@ssword0</add>
+    <add key="[SMARTFUNCTIONSDBNAME]">K2</add>
+    <add key="[LICENSEID]">dc594810-9a95-4b27-b9db-c8741d330683</add>
+    <add key="[LICENSEKEY]">5F209F6BF786290A2022879C8400517CA6006</add>
+    <add key="[LICENSEDATA]" />
+    <add key="[HOSTSERVERNAME]">k2demo1vm</add>
+    <add key="[HOSTSERVERPORT]">5555</add>
+    <add key="[NETLDAP]">LDAP://DC=</add>
+    <add key="[COMLDAP]">LDAP://</add>
+    <add key="[SMARTLDAP]">DC=</add>
+    <add key="[SETSPN]">False</add>
+    <add key="[LICENSETYPE]">PRODUCTION</add>
+    <add key="[LICENSEDPRODUCT]">K2FIVE</add>
+    <add key="[LBHOSTSERVERNAME]">k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[ISNLB]">true</add>
+    <add key="[PTA_OPTION]">ClientWindows</add>
+    <add key="[LBHOSTSERVERFQDN]">k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[SERVICEUSERCHANGED]">True</add>
+    <add key="[WORKFLOWSERVERPORT]">5252</add>
+    <add key="[LBDISCOVERYPORT]">49600</add>
+    <add key="[PRESERVE_CLAIMS_WS]">False</add>
+    <add key="[PRESERVE_ENVIRONMENTFIELDS_WS]">False</add>
+    <add key="[PREVK2SITENAME]" />
+    <add key="[OLD_K2SITEURL]" />
+    <add key="[OLD_K2SITEURL_SSL]" />
+    <add key="[K2SITEURL]" />
+    <add key="[WS_FIELDNAME]">Web Service URL</add>
+    <add key="[RT_FIELDNAME]">SmartForms Runtime</add>
+    <add key="[DE_FIELDNAME]">SmartForms Designer</add>
+    <add key="[K2SITEURL_SSL]">https://k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[WS_FIELDNAME_SSL]">Web Service URL SSL</add>
+    <add key="[RT_FIELDNAME_SSL]">SmartForms Runtime SSL</add>
+    <add key="[DE_FIELDNAME_SSL]">SmartForms Designer SSL</add>
+    <add key="[DE_FIELDNAME_RUNTIME]">SmartForms Designer Runtime</add>
+    <add key="[PRIMARY_WORKSPACE]">https://k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[SP_CERT_THUMBPRINT_WS]">250E7EDC6C171213ED3966AA3B36F89134CCFF2E</add>
+    <add key="[SP_GENERATE_CERT_PASS_WS]" />
+    <add key="[K2SITENAME]">K2</add>
+    <add key="[K2APPPOOL]">K2</add>
+    <add key="[XML_SHAREPOOL]">K2 for SharePoint</add>
+    <add key="[LBSITENAME]">https://k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[K2HOSTCONNECTIONSTRING_NOPASS]">Integrated=False;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5555;UserID=K2Admin;Password=[PASSWORD_REMOVED];</add>
+    <add key="[K2WFCONNECTIONSTRING_NOPASS]">Integrated=False;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5252;UserID=K2Admin;Password=[PASSWORD_REMOVED];</add>
+    <add key="[SMOS_PORT]">8888</add>
+    <add key="[K2HOSTCONNECTIONSTRINGNOUSER]">Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5555</add>
+    <add key="[K2WFCONNECTIONSTRINGNOUSER]">Integrated=True;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5252</add>
+    <add key="[RIJNDAEL_KEY]">j6S/Aul2j+95FW/lYzIQ8eW/+IYchDoX47+SBll6SFY=</add>
+    <add key="[RIJNDAEL_IV]">A5e95QnqBmJib7r5raGufw==</add>
+    <add key="[PRIMARY_WORKSPACE_HOST]">k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[PRIMARY_WORKSPACE_SCHEME]">https</add>
+    <add key="[TRUSTFOUND_VIEWFLOW]">false</add>
+    <add key="[TRUSTFOUND_RUNTIME]">false</add>
+    <add key="[SP12HIVE]">C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\12</add>
+    <add key="[SP14HIVE]">C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\14</add>
+    <add key="[SP15HIVE]">C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15</add>
+    <add key="[INSTALLTYPE]">APPIT</add>
+    <add key="[ISONDOMAIN]">False</add>
+    <add key="[BUILDNUMBER]">5.6_R1_20221018.1</add>
+    <add key="[PRODUCTVERSION]">5.0007.1000.1</add>
+    <add key="[BP_DB_VERSION]">5.0015.1000.1</add>
+    <add key="[SF_DB_VERSION]">5.0015.1000.1</add>
+    <add key="[SP_DB_VERSION]">5.0001.1000.0</add>
+    <add key="[CURRENTDBVERSION]">5.15.1000.1</add>
+    <add key="[CPUARC]">64</add>
+    <add key="[K2ADMINFQN]">K2SQL:K2Admin</add>
+    <add key="[SYSTEM_PWD]">4b46464e-db17-44fc-a2c5-b97d1037e31b</add>
+    <add key="[K2HOSTCONNECTIONSTRING_SYSTEM]">Integrated=False;IsPrimaryLogin=True;Authenticate=True;EncryptedPassword=False;SecurityLabelName=K2SQL;Host=k2demo1vm.eastus.cloudapp.azure.com;Port=5555;UserID=System;Password=4b46464e-db17-44fc-a2c5-b97d1037e31b</add>
+    <add key="[WORKSUSER]">k2demo1vm\K2Admin</add>
+    <add key="[WORKSPASS]">Pd2jz05/d8xr+XymSAIBHyvQyYEE8MPTg5sZYPS3QJQ=</add>
+    <add key="[K2APPPOOL_NET4]">K2_net4</add>
+    <add key="[ADMINUSER]">K2Admin</add>
+    <add key="[ADMINUSERCHANGED]">True</add>
+    <add key="[ADMINPASS]">HuWrpo84RY0gdrPg8FnSm6dKhEM8nz6SJh7P0gtT1DM=</add>
+    <add key="[USERSNAME]">k2demo1vm\K2Service</add>
+    <add key="[USERSPASS]">Pd2jz05/d8xr+XymSAIBHyvQyYEE8MPTg5sZYPS3QJQ=</add>
+    <add key="[FULLUSERSNAME]">k2demo1vm\K2Service</add>
+    <add key="[EXCHANGEINT]">False</add>
+    <add key="[EXCHANGE_CHANGED]">True</add>
+    <add key="[USESMTP]">True</add>
+    <add key="[USEEXCHANGE]">False</add>
+    <add key="[EXCHANGEONLINE]">False</add>
+    <add key="[USEAUTODISCOVER]">False</add>
+    <add key="[EXCHANGEEMAIL]" />
+    <add key="[EXCHANGEPASS]" />
+    <add key="[EXCHANGECONNECTIONSTRING]" />
+    <add key="[NOTIFYEMAIL]">system@k2.local</add>
+    <add key="[SMTP]">k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[SMTPCONNECTIONSTRING]">Port=;TLS=None;Host Name=k2demo1vm.eastus.cloudapp.azure.com;Authentication=Anonymous</add>
+    <add key="[SMTPCONNECTIONSTRINGANONYMOUS]">Port=;TLS=None;Host Name=k2demo1vm.eastus.cloudapp.azure.com;Authentication=Anonymous</add>
+    <add key="[INCOMING_EXCH_SVR]" />
+    <add key="[INCOMING_EXCH_PORT]" />
+    <add key="[INCOMING_EXCH_TLS]" />
+    <add key="[SMTPPORT]" />
+    <add key="[SMTPSERVER]">k2demo1vm.eastus.cloudapp.azure.com</add>
+    <add key="[SMTPCHANGED]">False</add>
+    <add key="[EXCHANGEADMINUSER]" />
+    <add key="[EXCHANGESTANDARDUSER]" />
+    <add key="[EXCH_MANAGEMENT]">false</add>
+    <add key="[EXCH_ADMINISTRATION]">false</add>
+    <add key="[EXCHANGEAUTODISCOVERENABLE]">false</add>
+    <add key="[INCOMINGNOTIFYEMAIL]" />
+    <add key="[SMTPUSER]" />
+    <add key="[SMTPUSERPASS]" />
+    <add key="[SERVICEACCOUNTK2FQN]" />
+    <add key="[SMARTACTIONSCHANGED]">false</add>
+    <add key="[SETSITESPN]">False</add>
+    <add key="[SERVICE_NAME]">K2 Server</add>
+  </VARIABLES>
+</PRODUCT>
