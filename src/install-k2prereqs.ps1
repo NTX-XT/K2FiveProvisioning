@@ -37,7 +37,7 @@ $configuration.infrastructure.azure.VirtualMachine.admin.password, $computerName
 #endregion
 
 #region 4. Restart
-Restart-Computer -ComputerName $computerName -Wait -For PowerShell -Timeout 600 -Delay 5
+#Restart-Computer -ComputerName $computerName -Wait -For PowerShell -Timeout 600 -Delay 5
 #endregion
 
 
