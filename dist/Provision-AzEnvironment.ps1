@@ -4,9 +4,17 @@ param(
 )
 
 #region 0. Loading and connecting Azure
-if (-not $(Get-Module Az)) { Import-Module Az -Force } 
+if (-not $(Get-Module Az)) { 
+    Write-Verbose "Importing Azure Module"
+    Import-Module Az -Force 
+} 
+Write-Verbose "Loading configuration"
 $configuration = get-content -raw -path $ConfigurationFile | ConvertFrom-Json
-Connect-AzAccount -Subscription $configuration.infrastructure.azure.tenant.Subscription -TenantId $configuration.infrastructure.azure.tenant.id;  
+
+# TODO: Validate Configuration
+
+Write-Verbose "Connecting to Azure"
+Connect-AzAccount -Subscription $configuration.infrastructure.azure.subscription
 #endregion
 
 #region 1. Create Resource Group
@@ -49,7 +57,7 @@ $AzSQLServer = New-AzSqlServer @K2SQLServer
 
 ## Create the Azure SQL Server Firewall Rule for external use if requested
 
-if ($configuration.infrastructure.azure.sql.server.withExternal){
+if ($configuration.infrastructure.azure.sql.server.withExternal) {
     $K2SQLFirewall = @{
         ResourceGroupName = $configuration.infrastructure.azure.resourceGroup.name
         ServerName        = $AzSQLServer.ServerName
@@ -90,14 +98,14 @@ Add-AzVirtualNetworkSubnetConfig @K2SubNet
 $AzVNet | Set-AzVirtualNetwork
 
 $K2IPPublic = @{
-    Name = $configuration.infrastructure.azure.publicIP.name
+    Name              = $configuration.infrastructure.azure.publicIP.name
     ResourceGroupName = $K2RG.Name
-    Location = 'eastus'
-    Sku = 'Standard'
-    AllocationMethod = 'Static'
-    IpAddressVersion = 'IPv4'
-    DomainNameLabel =$configuration.infrastructure.azure.publicIP.DomainNameLabel.ToLower()
-    Zone = 2
+    Location          = 'eastus'
+    Sku               = 'Standard'
+    AllocationMethod  = 'Static'
+    IpAddressVersion  = 'IPv4'
+    DomainNameLabel   = $configuration.infrastructure.azure.publicIP.DomainNameLabel.ToLower()
+    Zone              = 2
 }
 $AzIPPublic = New-AzPublicIpAddress @K2IPPublic
 
@@ -135,46 +143,46 @@ Remove-AzResourceGroup -ResourceGroupName $configuration.infrastructure.azure.re
 
 ## Create Storage Account
 $K2StorageAccount = @{
-    ResourceGroupName = $configuration.infrastructure.azure.resourceGroup.name
-    Name = $configuration.infrastructure.azure.storageAccount.name
-    Location = $configuration.infrastructure.azure.storageAccount.location
-    Kind = $configuration.infrastructure.azure.storageAccount.kind
-    SkuName = $configuration.infrastructure.azure.storageAccount.skuName
+    ResourceGroupName    = $configuration.infrastructure.azure.resourceGroup.name
+    Name                 = $configuration.infrastructure.azure.storageAccount.name
+    Location             = $configuration.infrastructure.azure.storageAccount.location
+    Kind                 = $configuration.infrastructure.azure.storageAccount.kind
+    SkuName              = $configuration.infrastructure.azure.storageAccount.skuName
     EnableLargeFileShare = $configuration.infrastructure.azure.storageAccount.enableLargeFileShare
 }
 $StorageAccount = New-AzStorageAccount @K2StorageAccount
 
 ## Create Storage Container
 $K2StorageContainer = @{
-    Name = "k2setup"
-    Context = $StorageAccount.Context
+    Name       = "k2setup"
+    Context    = $StorageAccount.Context
     Permission = "Blob"
 }
 New-AzStorageContainer @K2StorageContainer
 
 ## Create File Share
 $K2FileStorage = @{
-    StorageAccount = $StorageAccount
-    Name = $configuration.infrastructure.azure.fileStorage.name
+    StorageAccount  = $StorageAccount
+    Name            = $configuration.infrastructure.azure.fileStorage.name
     EnabledProtocol = "SMB"
-    QuotaGiB = 1024
+    QuotaGiB        = 1024
 }
 New-AzRmStorageShare @K2FileStorage
 
 $K2StorageDirectory = @{
-    Context = $StorageAccount.Context
+    Context   = $StorageAccount.Context
     ShareName = $K2FileStorage.Name
-    Path = "K2Config"
+    Path      = "K2Config"
 }
 New-AzStorageDirectory @K2StorageDirectory
 
 ##  Mount file share 
-$runCommandparameters =@{
-    AccountStorageKey = $StorageAccountKey
+$runCommandparameters = @{
+    AccountStorageKey  = $StorageAccountKey
     AccountStorageName = $K2StorageAccount.Name
-    FileShareName = $K2FileStorage.Name
+    FileShareName      = $K2FileStorage.Name
 }
 Invoke-AzVMRunCommand -ResourceGroupName $K2RG.Name -VMName $K2VM.Name -CommandId 'RunPowerShellScript' -ScriptPath '.\mount-K2FileShareFromVM.ps1' `
--Parameter $runCommandparameters
+    -Parameter $runCommandparameters
 
 #endregion

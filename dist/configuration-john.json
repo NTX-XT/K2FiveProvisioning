@@ -1,0 +1,52 @@
+{
+    "infrastructure": {
+        "azure": {
+            "subscription": "8a455956-2dad-4d47-a9ef-b1f7b2b930a2",
+            "resourceGroup": {
+                "name": "NintexOPTrial",
+                "location": "eastus"
+            },
+            "sql": {
+                "admin": {
+                    "login": "SQLAdmin",
+                    "password": "AVeryStrongP@ssword0"
+                },
+                "server": {
+                    "name": "nintexoptrial-sql",
+                    "location": "eastus",
+                    "withExternal": true
+                },
+                "database": {
+                    "name": "NintexOPTrial"
+                }
+            },
+            "virtualNetwork": {
+                "name": "NintexOPTrial-vnet"
+            },
+            "publicIP": {
+                "name": "NintexOPTrial-ip",
+                "domainNameLabel": "NintexOPTrial"
+            },
+            "VirtualMachine": {
+                "admin": {
+                    "login": "k2admin",
+                    "password": "AVeryStrongP@ssword0"
+                },
+                "name": "NintexOPTrial",
+                "location": "eastus",
+                "imageName": "MicrosoftWindowsServer:WindowsServer:2022-Datacenter:latest",
+                "size": "Standard_DS3"
+            },
+            "storageAccount": {
+                "name": "NintexOPTrial-storage",
+                "location": "eastus",
+                "kind": "StorageV2",
+                "skuName": "Standard_LRS",
+                "enableLargeFileShare": true
+            }
+        }
+    },
+    "setup": {
+        "repository": "C:\\K2"
+    }
+}

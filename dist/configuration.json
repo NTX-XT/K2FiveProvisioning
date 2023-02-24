@@ -1,0 +1,62 @@
+{
+    "infrastructure": {
+        "azure": {
+            "tenant": {
+                "id": "07948bdc-f1ec-40d6-a490-2380819cc701",
+                "subscription": "sub_immersion"
+            },
+            "resourceGroup": {
+                "name": "K2Demo1",
+                "location": "eastus"
+            },
+            "sql": {
+                "admin": {
+                    "login": "SQLAdmin",
+                    "password": "AVeryStrongP@ssword0"
+                },
+                "server": {
+                    "name": "k2demo1sql",
+                    "location": "eastus",
+                    "withExternal": true
+                },
+                "database": {
+                    "name": "K2"
+                }
+            },
+            "virtualNetwork": {
+                "name": "K2Demo1VNet"
+            },
+            "publicIP": {
+                "name": "K2IPPublic",
+                "domainNameLabel": "k2demo1vm"
+            },
+            "VirtualMachine": {
+                "admin": {
+                    "login": "K2Admin",
+                    "password": "AVeryStrongP@ssword0"
+                },
+                "name": "K2Demo1VM",
+                "location": "eastus",
+                "imageName": "MicrosoftWindowsServer:WindowsServer:2022-Datacenter:latest",
+                "size": "Standard_DS3"
+            },
+            "storageAccount": {
+                "name": "k2demo1storageacct",
+                "location": "eastus",
+                "kind": "StorageV2",
+                "skuName": "Standard_LRS",
+                "enableLargeFileShare": true
+            },
+            "fileStorage": {
+                "name": "k2demo1"
+            }
+        },
+        "aws": {}
+    },
+    "setup": {
+        "repository": "C:\\K2"
+    },
+    "demos": [
+        {}
+    ]
+}
