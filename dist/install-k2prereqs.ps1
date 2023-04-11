@@ -1,6 +1,6 @@
 param(
     [Parameter()]
-    [string]$ConfigurationFile = ".\configuration.json"
+    [string]$ConfigurationFile = ".\dist\configuration-trial.json"
 )
 
 #region 0 Loading
@@ -16,9 +16,9 @@ $s = New-PSSession -ComputerName $computerName -Credential $credential -SessionO
 
 #region 2. Provision K2 Directory
 Invoke-Command -ComputerName $computerName -ScriptBlock { New-Item -Path C:\K2 -type directory -Force } -Credential $credential -SessionOption $so -UseSSL
-Copy-Item .\packaging.json -Destination C:\K2\packaging.json -ToSession $s -Force
-Copy-Item .\deploy_localfiles\prepare-K2Deployment.ps1 -Destination C:\K2\prepare-K2Deployment.ps1 -ToSession $s
-Copy-Item .\deploy_localfiles\K2Unattended.xml -Destination C:\K2\K2Unattended.xml -ToSession $s
+Copy-Item src\packaging.json -Destination C:\K2\packaging.json -ToSession $s -Force
+Copy-Item src\deploy_localfiles\prepare-K2Deployment.ps1 -Destination C:\K2\prepare-K2Deployment.ps1 -ToSession $s
+Copy-Item src\deploy_localfiles\K2Unattended.xml -Destination C:\K2\K2Unattended.xml -ToSession $s
 #endregion
 
 #region 3. Start Script 

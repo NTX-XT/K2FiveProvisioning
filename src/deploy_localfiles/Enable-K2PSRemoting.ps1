@@ -4,6 +4,8 @@ param(
 )
 
 #region 1. Enable PS Remoting
+Write-Verbose "Enabling PS Remoting"
+
 Enable-PSRemoting -SkipNetworkProfileCheck -Force
 Set-Item WSMan:localhost\client\trustedhosts -value * -Force
 New-NetFirewallRule -Name "Allow WinRM HTTPS" -DisplayName "WinRM HTTPS" -Enabled True -Profile Any -Action Allow -Direction Inbound -LocalPort 5986 -Protocol TCP

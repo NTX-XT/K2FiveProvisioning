@@ -1,6 +1,6 @@
 param(
     [Parameter()]
-    [string]$ConfigurationFile = ".\configuration.json"
+    [string]$ConfigurationFile = ".\dist\configuration-trial.json"
 )
 
 #region 0. Loading and connecting Azure
@@ -8,16 +8,17 @@ if (-not $(Get-Module Az)) {
     Write-Verbose "Importing Azure Module"
     Import-Module Az -Force 
 } 
-Write-Verbose "Loading configuration"
+Write-Verbose "0. Loading configuration"
 $configuration = get-content -raw -path $ConfigurationFile | ConvertFrom-Json
 
 # TODO: Validate Configuration
 
-Write-Verbose "Connecting to Azure"
-Connect-AzAccount -Subscription $configuration.infrastructure.azure.subscription
+Write-Verbose "0. Connecting to Azure"
+Connect-AzAccount -Subscription $configuration.infrastructure.azure.tenant.subscription
 #endregion
 
 #region 1. Create Resource Group
+Write-Verbose "1. Creating Resource Group"
 $K2RG = @{
     Name     = $configuration.infrastructure.azure.resourceGroup.name
     Location = $configuration.infrastructure.azure.resourceGroup.location
@@ -39,47 +40,49 @@ if (-not $?) {
 #endregion
 
 #region 2. Provision Azure SQL DB
+#Write-Verbose "2. Provisioning Azure SQL DB"
 
-$K2SQLAdmin = @{
-    Login    = $configuration.infrastructure.azure.sql.admin.login
-    Password = ConvertTo-SecureString -String $configuration.infrastructure.azure.sql.admin.password -AsPlainText -Force
-}
+#$K2SQLAdmin = @{
+#     Login    = $configuration.infrastructure.azure.sql.admin.login
+#     Password = ConvertTo-SecureString -String $configuration.infrastructure.azure.sql.admin.password -AsPlainText -Force
+# }
 
-## Create the Azure SQL server (Version 12.0) with SQL authentication as required by K2 
-$K2SQLServer = @{
-    ResourceGroupName           = $configuration.infrastructure.azure.resourceGroup.name
-    Location                    = $configuration.infrastructure.azure.sql.server.location
-    ServerName                  = $configuration.infrastructure.azure.sql.server.name
-    ServerVersion               = "12.0"
-    SqlAdministratorCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2SQLAdmin.Login, $K2SQLAdmin.Password
-}
-$AzSQLServer = New-AzSqlServer @K2SQLServer
+# ## Create the Azure SQL server (Version 12.0) with SQL authentication as required by K2 
+# $K2SQLServer = @{
+#     ResourceGroupName           = $configuration.infrastructure.azure.resourceGroup.name
+#     Location                    = $configuration.infrastructure.azure.sql.server.location
+#     ServerName                  = $configuration.infrastructure.azure.sql.server.name
+#     ServerVersion               = "12.0"
+#     SqlAdministratorCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $K2SQLAdmin.Login, $K2SQLAdmin.Password
+# }
+# $AzSQLServer = New-AzSqlServer @K2SQLServer
 
 ## Create the Azure SQL Server Firewall Rule for external use if requested
 
-if ($configuration.infrastructure.azure.sql.server.withExternal) {
-    $K2SQLFirewall = @{
-        ResourceGroupName = $configuration.infrastructure.azure.resourceGroup.name
-        ServerName        = $AzSQLServer.ServerName
-        FirewallRuleName  = "AllowAllWindowsAzureIps"
-        StartIpAddress    = "0.0.0.0" 
-        EndIpAddress      = "0.0.0.0" 
-    }
-    New-AzSqlServerFirewallRule @K2SQLFirewall
-}
+# if ($configuration.infrastructure.azure.sql.server.withExternal) {
+#     $K2SQLFirewall = @{
+#         ResourceGroupName = $configuration.infrastructure.azure.resourceGroup.name
+#         ServerName        = $AzSQLServer.ServerName
+#         FirewallRuleName  = "AllowAllWindowsAzureIps"
+#         StartIpAddress    = "0.0.0.0" 
+#         EndIpAddress      = "0.0.0.0" 
+#     }
+#     New-AzSqlServerFirewallRule @K2SQLFirewall
+# }
 
 ## Create the Azure SQL Database with an S2 performance level (minimum requirement for K2 integration)
-$K2SQLDB = @{
-    DatabaseName                  = $configuration.infrastructure.azure.sql.database.name
-    ResourceGroupName             = $configuration.infrastructure.azure.resourceGroup.name
-    ServerName                    = $AzSQLServer.ServerName
-    RequestedServiceObjectiveName = "S2" 
-}
-New-AzSqlDatabase  @K2SQLDB
+# $K2SQLDB = @{
+#     DatabaseName                  = $configuration.infrastructure.azure.sql.database.name
+#     ResourceGroupName             = $configuration.infrastructure.azure.resourceGroup.name
+#     ServerName                    = $AzSQLServer.ServerName
+#     RequestedServiceObjectiveName = "S2" 
+# }
+# New-AzSqlDatabase  @K2SQLDB
     
 #endregion
 
 #region 3. Create Virtual Networking
+Write-Verbose "3. Creating Virtual Network"
 
 $K2VNet = @{
     Name              = $configuration.infrastructure.azure.virtualNetwork.name
@@ -100,7 +103,7 @@ $AzVNet | Set-AzVirtualNetwork
 $K2IPPublic = @{
     Name              = $configuration.infrastructure.azure.publicIP.name
     ResourceGroupName = $K2RG.Name
-    Location          = 'eastus'
+    Location          = $K2RG.Location
     Sku               = 'Standard'
     AllocationMethod  = 'Static'
     IpAddressVersion  = 'IPv4'
@@ -112,6 +115,7 @@ $AzIPPublic = New-AzPublicIpAddress @K2IPPublic
 #endregion
 
 #region 4. Create the VM
+Write-Verbose "3. Creating Virtual Machine"
 
 $K2VMAdmin = @{
     Login    = $configuration.infrastructure.azure.VirtualMachine.admin.login
@@ -133,6 +137,7 @@ $K2VM = @{
 New-AzVM @K2VM 
 #endregion
 
+Write-Verbose "Azure Provisioning completed"
 Exit
 
 #region 9. Clean-up

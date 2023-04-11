@@ -24,19 +24,19 @@ Install-WindowsFeature NET-Framework-Features, NET-Framework-45-Features -Includ
 ## Prerequisites for K2 Sites
 Install-WindowsFeature Web-Server -IncludeAllSubFeature -IncludeManagementTools 
 
-Import-Module "WebAdministration"
-New-Item C:\inetpub\K2 -type Directory
-New-Item IIS:\AppPools\K2
-Set-ItemProperty -Path IIS:\AppPools\K2 -Name managedRuntimeVersion -Value 'v2.0'
-Set-ItemProperty -Path IIS:\AppPools\K2 -Name managedPipelineMode -Value 'Classic'
-Set-ItemProperty -Path IIS:\AppPools\K2 -Name processmodel.identityType -Value 3
-Set-ItemProperty -Path IIS:\AppPools\K2 -Name processmodel.userName -Value $username
-Set-ItemProperty -Path IIS:\AppPools\K2 -Name processmodel.password -Value $userpass
-New-Item iis:\Sites\K2 -bindings @{protocol="https";bindingInformation=":443:" + $dnsname} -physicalPath C:\inetpub\K2
-$certificate = $(Get-ChildItem Cert:\LocalMachine\My -DnsName $dnsname)
-(Get-WebBinding -Name K2 -Port 443 -Protocol "https" -HostHeader $dnsname).AddSslCertificate($certificate.Thumbprint, "my")
-Set-WebConfiguration system.webServer/security/authentication/anonymousAuthentication -PSPath IIS:\ -Location K2 -Value @{enabled="False"}
-Set-WebConfiguration system.webServer/security/authentication/windowsAuthentication -PSPath IIS:\ -Location K2 -Value @{enabled="True"}
+# Import-Module "WebAdministration"
+# New-Item C:\inetpub\K2 -type Directory
+# New-Item IIS:\AppPools\K2
+# Set-ItemProperty -Path IIS:\AppPools\K2 -Name managedRuntimeVersion -Value 'v2.0'
+# Set-ItemProperty -Path IIS:\AppPools\K2 -Name managedPipelineMode -Value 'Classic'
+# Set-ItemProperty -Path IIS:\AppPools\K2 -Name processmodel.identityType -Value 3
+# Set-ItemProperty -Path IIS:\AppPools\K2 -Name processmodel.userName -Value $username
+# Set-ItemProperty -Path IIS:\AppPools\K2 -Name processmodel.password -Value $userpass
+# New-Item iis:\Sites\K2 -bindings @{protocol="https";bindingInformation=":443:" + $dnsname} -physicalPath C:\inetpub\K2
+# $certificate = $(Get-ChildItem Cert:\LocalMachine\My -DnsName $dnsname)
+# (Get-WebBinding -Name K2 -Port 443 -Protocol "https" -HostHeader $dnsname).AddSslCertificate($certificate.Thumbprint, "my")
+# Set-WebConfiguration system.webServer/security/authentication/anonymousAuthentication -PSPath IIS:\ -Location K2 -Value @{enabled="False"}
+# Set-WebConfiguration system.webServer/security/authentication/windowsAuthentication -PSPath IIS:\ -Location K2 -Value @{enabled="True"}
 
 ## Prerequisites for K2 Server
 C:\k2\vc_redist.x64.exe /install /q /norestart
@@ -58,6 +58,7 @@ $setuppath = $setupfile.replace('.exe','')
 C:\K2\7zr.exe x $setupfile $("-o" + $setuppath)
 #endregion
 
+Exit
 #region 5.0 Install K2 using unattended
 Set-Location  $setuppath\installation
 .\SourceCode.SetupManager.exe /install:"C:\K2\K2Unattended.xml" 

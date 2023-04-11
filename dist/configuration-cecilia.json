@@ -1,13 +1,10 @@
 {
     "infrastructure": {
         "azure": {
-            "tenant":{
-                "id": "07948bdc-f1ec-40d6-a490-2380819cc701",
-                "subscription": "sub_immersion"
-            },
+            "subscription": "8a455956-2dad-4d47-a9ef-b1f7b2b930a2",
             "resourceGroup": {
-                "name": "K2Demo1",
-                "location": "eastus"
+                "name": "ByC-K2",
+                "location": "northeurope"
             },
             "sql": {
                 "admin": {
@@ -15,8 +12,8 @@
                     "password" : "AVeryStrongP@ssword0"
                 },
                 "server":{
-                    "name": "k2demo1sql",
-                    "location": "eastus",
+                    "name": "byc-k2sql",
+                    "location": "northeurope",
                     "withExternal": true
                 },
                 "database": {
@@ -24,31 +21,35 @@
                 }
             },
             "virtualNetwork": {
-                "name": "K2Demo1VNet"
+                "name": "ByC-K2VNet"
             },
             "publicIP":{
-                "name": "K2Demo1IPPublic",
-                "domainNameLabel": "k2demo1vm"
+                "name": "ByC-K2IPPublic",
+                "domainNameLabel": "byc-k2"
             },
             "VirtualMachine": {
                 "admin": {
                     "login": "K2Admin",
                     "password": "AVeryStrongP@ssword0"
                 },
-                "name": "K2Demo1VM",
-                "location": "eastus",
+                "service": {
+                    "login": "K2Service",
+                    "password": "AVeryStrongP@ssword0"
+                },
+                "name": "ByC-K2VM",
+                "location": "northeurope",
                 "imageName" : "MicrosoftWindowsServer:WindowsServer:2022-Datacenter:latest",
                 "size": "Standard_DS3"
             },
             "storageAccount":{
-                "name": "k2demo1storageacct",
-                "location": "eastus",
+                "name": "byc-k2storageacct",
+                "location": "northeurope",
                 "kind": "StorageV2",
                 "skuName": "Standard_LRS",
                 "enableLargeFileShare": true 
             },
             "fileStorage":{
-                "name": "k2demo1"
+                "name": "byc-k2"
             }
         },
         "aws": {
